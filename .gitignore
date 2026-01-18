@@ -1,1 +1,8 @@
+# cmake configuration
 build/
+
+# macos
+.DS_Store
+
+# examples
+snake.c
