@@ -10,32 +10,102 @@ struct Point {
 int min(int a, int b);
 int max(int a, int b);
 
+enum Type {
+    T,
+    Block,
+    L,
+    ReverseL,
+    Z,
+    S,
+    I
+};
+
 class Tetrimino {  
 public:
     static constexpr int SIZE_BLOCK = 8; // pixels
     static constexpr int FACTOR = 3;
     static constexpr int STEP = SIZE_BLOCK * FACTOR;
     Point m_window = Point{240, 480};
+
     Point m_pos = {0, 0};
-    Tetrimino(Point a);
+
+   //Tetrimino(Point a);
+    virtual ~Tetrimino() = default;
+
     Point* getShape();
-    int height();
-    int width();
+ 
     void moveDown(int increment);
     void moveLeft(int increment);
     void moveRight(int increment);
-    bool update(Point& a, Point& window);
-      bool canMoveRight(int bound);
-      bool canMoveLeft(int bound);
-      bool canMoveDown(int bound);
+    virtual bool update(Point const& a, Point const& window) = 0;
+
+    bool canMoveRight(int bound);
+    bool canMoveLeft(int bound);
+    bool canMoveDown(int bound);
     bool canMove(std::vector<std::vector<bool>> grid, char direction);
 
 
-private:
+protected:
     Point m_piece[4] = {};
-    bool lower(Point& a, Point& b);
+    bool lower(Point const& a, Point const& b);
     void buildGrid();
     
+};
+
+class Teewee : public Tetrimino {
+public:
+    Teewee(Point a);
+    ~Teewee() = default;
+    // virtual ~Teewee() is automatically generated
+    bool update(Point const& a, Point const& window) override;
+
+};
+
+class Smashboy : public Tetrimino {
+public:
+    Smashboy(Point a);
+    ~Smashboy() = default; // virtual ~Teewee() is automatically generated
+    bool update(Point const& a, Point const& window) override;
+
+};
+
+class Hero : public Tetrimino {
+public:
+    Hero(Point a);
+    ~Hero() = default;
+    bool update(Point const& a, Point const& window) override;
+
+};
+
+class RhodeIsland : public Tetrimino {
+public:
+    RhodeIsland(Point a);
+    ~RhodeIsland() = default;
+    bool update(Point const& a, Point const& window) override;
+};
+
+// Z
+class Cleveland : public Tetrimino {
+public:
+    Cleveland(Point a);
+    ~Cleveland() = default;
+    bool update(Point const& a, Point const& window) override;
+};
+
+// L
+class OrangeRicky : public Tetrimino {
+public:
+    OrangeRicky(Point a);
+    ~OrangeRicky() = default;
+    bool update(Point const& a, Point const& window) override;
+};
+
+// Reverse L
+class BlueRicky : public Tetrimino {
+public:
+    BlueRicky(Point a);
+    ~BlueRicky() = default;
+    bool update(Point const& a, Point const& window) override;
 };
 
 class Tetris {
@@ -45,10 +115,13 @@ public:
     static constexpr int FACTOR = 3;
     static constexpr int STEP = SIZE_BLOCK * FACTOR;
     std::vector<std::vector<bool>> m_grid;
-    std::vector<Tetrimino> m_tetriminos;
-    void add(Tetrimino const& tetrimino);
+    std::vector<std::unique_ptr<Tetrimino>> m_tetriminos;
+    void add(std::unique_ptr<Tetrimino> tetrimino);
     Tetrimino& current();
+  
     void updateGrid();
+    std::unique_ptr<Tetrimino> block(Type type);
+    std::unique_ptr<Tetrimino> block();
 
 private:
     Point m_window = Point{240, 480};

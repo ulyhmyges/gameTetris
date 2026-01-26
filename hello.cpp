@@ -25,7 +25,7 @@ Tetris game = Tetris();
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 {   
     char *png_path = NULL;
-    game.add(Tetrimino({0, 0}));
+    game.add(game.block());
     
     /* Create the window */
     if (!SDL_CreateWindowAndRenderer("Hello World", W_X, W_Y, SDL_WINDOW_RESIZABLE, &window, &renderer)) {
@@ -114,8 +114,8 @@ SDL_AppResult SDL_AppIterate(void *appstate)
     SDL_RenderDebugText(renderer, x, y, message);
 
     // tetriminos
-    for (Tetrimino t : game.m_tetriminos){
-        shape = t.getShape();
+    for (std::unique_ptr<Tetrimino>& t : game.m_tetriminos){
+        shape = t->getShape();
         for (int i = 0; i < 4; ++i) {
             dst.x = static_cast<float>(shape[i].x);
             dst.y = static_cast<float>(shape[i].y);
@@ -138,8 +138,7 @@ SDL_AppResult SDL_AppIterate(void *appstate)
                 game.current().update(game.current().m_pos, game.current().m_window);
         } else {
             game.updateGrid();
-            SDL_Log("update every second ?");
-            game.add(Tetrimino(Point{0, 0}));
+            game.add(game.block());
         }
     }
  

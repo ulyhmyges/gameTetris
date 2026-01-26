@@ -18,12 +18,12 @@ Tetris::Tetris(){
     buildGrid();
 }
 
-void Tetris::add(Tetrimino const& tetrimino){
-    m_tetriminos.push_back(tetrimino);
+void Tetris::add(std::unique_ptr<Tetrimino> tetrimino){
+    m_tetriminos.push_back(std::move(tetrimino));
 }
 
 Tetrimino& Tetris::current() {
-    return m_tetriminos[m_tetriminos.size()-1];
+    return *m_tetriminos[m_tetriminos.size()-1];
 }
 void Tetris::buildGrid() {
     for (int x = 0; x < m_window.x / STEP; ++x) {
@@ -43,31 +43,56 @@ void Tetris::updateGrid(){
     }
 }
 
+std::unique_ptr<Tetrimino> Tetris::block() {
+    Type type = static_cast<Type>(std::rand() % 7);
+    return block(type);
+}
+
+
+std::unique_ptr<Tetrimino> Tetris::block(Type type) {
+    int x = (std::rand() % 10) * STEP;
+    switch (type){
+        case T:
+            return std::make_unique<Teewee>(Point{x, 0});
+        case Block:
+            return std::make_unique<Smashboy>(Point{x, 0});
+        case L:
+            return std::make_unique<OrangeRicky>(Point{x, 0});
+        case ReverseL:
+            return std::make_unique<BlueRicky>(Point{x, 0});
+        case Z:
+            return std::make_unique<Cleveland>(Point{x, 0});
+        case S:
+            return std::make_unique<RhodeIsland>(Point{x, 0});
+        case I:
+            return std::make_unique<Hero>(Point{x, 0});
+    }
+}
 
 // class Tetrimino
-Tetrimino::Tetrimino(Point a) {
-    update(a, m_window);
-}
+// Tetrimino::Tetrimino(Point a) {
+//     update(a, m_window);
+// }
 
-bool Tetrimino::update(Point& a, Point& dim){
-    bool isUpdated = false;
-    m_pos.x = a.x;
-    m_pos.y = a.y;
+// bool Tetrimino::update(Point& a, Point& dim){
+//     bool isUpdated = false;
+//     m_pos.x = a.x;
+//     m_pos.y = a.y;
   
-    Point un = Point{m_pos.x, m_pos.y + STEP};
-    Point deux = Point{m_pos.x,  m_pos.y + STEP * 2};
-    Point trois = Point{m_pos.x + STEP, m_pos.y + STEP};
+//     Point un = Point{m_pos.x, m_pos.y + STEP};
+//     Point deux = Point{m_pos.x,  m_pos.y + STEP * 2};
+//     Point trois = Point{m_pos.x + STEP, m_pos.y + STEP};
 
-    if (lower(m_pos, dim) && lower(un, dim) && lower(deux, dim) && lower(trois, dim)) {
-        m_piece[0] = m_pos;
-        m_piece[1] = un;
-        m_piece[2] = deux;
-        m_piece[3] = trois;
-        isUpdated = true;
-    }
+//     if (lower(m_pos, dim) && lower(un, dim) && lower(deux, dim) && lower(trois, dim)) {
+//         m_piece[0] = m_pos;
+//         m_piece[1] = un;
+//         m_piece[2] = deux;
+//         m_piece[3] = trois;
+//         isUpdated = true;
+//     }
   
-    return isUpdated;
-}
+//     return isUpdated;
+// }
 bool Tetrimino::canMoveDown(int bound){
     bool move = true;
     for (int i = 0; i < 4; ++i){
@@ -126,9 +151,9 @@ bool Tetrimino::canMoveRight(int bound){
     return move;
 }
 
-bool Tetrimino::lower(Point& a, Point& b) {
+bool Tetrimino::lower(Point const& a, Point const& b) {
     bool islower = false;
-    if (a.x < b.x || a.y < b.y){
+    if (a.x < b.x && a.y < b.y){
         islower = true;
     }
     return islower;
@@ -154,12 +179,191 @@ void Tetrimino::moveLeft(int increment){
     update(m_pos, m_window);
 }
 
-int Tetrimino::height() {
-    int minimum = m_piece[0].y;
-    int maximum = m_piece[0].y;
-    for (int i = 1; i < 4; ++i) {
-        minimum = min(minimum, m_piece[i].y);
-        maximum = max(maximum,m_piece[i].y);
+Teewee::Teewee(Point a){
+    bool valid = update(a, m_window);
+    while (!valid) {
+        int x = (std::rand() % 10) * STEP;
+        valid = update(Point{x, a.y}, m_window);
     }
-    return 0;
+}
+
+bool Teewee::update(Point const& a, Point const& dim){
+    bool isUpdated = false;
+    m_pos.x = a.x;
+    m_pos.y = a.y;
+  
+    Point un = Point{m_pos.x, m_pos.y + STEP};
+    Point deux = Point{m_pos.x,  m_pos.y + STEP * 2};
+    Point trois = Point{m_pos.x + STEP, m_pos.y + STEP};
+
+    if (lower(m_pos, dim) && lower(un, dim) && lower(deux, dim) && lower(trois, dim)) {
+        m_piece[0] = m_pos;
+        m_piece[1] = un;
+        m_piece[2] = deux;
+        m_piece[3] = trois;
+        isUpdated = true;
+    }
+  
+    return isUpdated;
+}
+
+Smashboy::Smashboy(Point a){
+    bool valid = update(a, m_window);
+    while (!valid) {
+        int x = (std::rand() % 10) * STEP;
+        valid = update(Point{x, a.y}, m_window);
+    }
+}
+
+bool Smashboy::update(Point const& a, Point const& dim){
+    bool isUpdated = false;
+    m_pos.x = a.x;
+    m_pos.y = a.y;
+    Point un = Point{m_pos.x, m_pos.y + STEP};
+    Point deux = Point{m_pos.x + STEP,  m_pos.y};
+    Point trois = Point{m_pos.x + STEP, m_pos.y + STEP};
+
+    if (lower(m_pos, dim) && lower(un, dim) && lower(deux, dim) && lower(trois, dim)) {
+        m_piece[0] = m_pos;
+        m_piece[1] = un;
+        m_piece[2] = deux;
+        m_piece[3] = trois;
+        isUpdated = true;
+    }
+    return isUpdated;
+}
+
+// I
+Hero::Hero(Point a){
+    bool valid = update(a, m_window);
+    while (!valid) {
+        int x = (std::rand() % 10) * STEP;
+        valid = update(Point{x, a.y}, m_window);
+    }
+}
+
+bool Hero::update(Point const& a, Point const& dim){
+    bool isUpdated = false;
+    m_pos.x = a.x;
+    m_pos.y = a.y;
+    Point un = Point{m_pos.x, m_pos.y + STEP};
+    Point deux = Point{m_pos.x,  m_pos.y + STEP*2};
+    Point trois = Point{m_pos.x, m_pos.y + STEP*3};
+
+    if (lower(m_pos, dim) && lower(un, dim) && lower(deux, dim) && lower(trois, dim)) {
+        m_piece[0] = m_pos;
+        m_piece[1] = un;
+        m_piece[2] = deux;
+        m_piece[3] = trois;
+        isUpdated = true;
+    }
+    return isUpdated;
+}
+
+// S
+RhodeIsland::RhodeIsland(Point a){
+    bool valid = update(a, m_window);
+    while (!valid) {
+        int x = (std::rand() % 10) * STEP;
+        valid = update(Point{x, a.y}, m_window);
+    }
+}
+
+bool RhodeIsland::update(Point const& a, Point const& dim){
+    bool isUpdated = false;
+    m_pos.x = a.x;
+    m_pos.y = a.y;
+    Point un = Point{m_pos.x - STEP, m_pos.y};
+    Point deux = Point{m_pos.x - STEP,  m_pos.y + STEP};
+    Point trois = Point{m_pos.x - STEP*2, m_pos.y + STEP};
+
+    if (lower(m_pos, dim) && lower(un, dim) && lower(deux, dim) && lower(trois, dim)) {
+        m_piece[0] = m_pos;
+        m_piece[1] = un;
+        m_piece[2] = deux;
+        m_piece[3] = trois;
+        isUpdated = true;
+    }
+    return isUpdated;
+}
+
+// Z
+Cleveland::Cleveland(Point a){
+    bool valid = update(a, m_window);
+    while (!valid) {
+        int x = (std::rand() % 10) * STEP;
+        valid = update(Point{x, a.y}, m_window);
+    }
+}
+
+bool Cleveland::update(Point const& a, Point const& dim){
+    bool isUpdated = false;
+    m_pos.x = a.x;
+    m_pos.y = a.y;
+    Point un = Point{m_pos.x + STEP, m_pos.y};
+    Point deux = Point{m_pos.x + STEP,  m_pos.y + STEP};
+    Point trois = Point{m_pos.x + STEP*2, m_pos.y + STEP};
+
+    if (lower(m_pos, dim) && lower(un, dim) && lower(deux, dim) && lower(trois, dim)) {
+        m_piece[0] = m_pos;
+        m_piece[1] = un;
+        m_piece[2] = deux;
+        m_piece[3] = trois;
+        isUpdated = true;
+    }
+    return isUpdated;
+}
+
+// L
+OrangeRicky::OrangeRicky(Point a){
+    bool valid = update(a, m_window);
+    while (!valid) {
+        int x = (std::rand() % 10) * STEP;
+        valid = update(Point{x, a.y}, m_window);
+    }
+}
+
+bool OrangeRicky::update(Point const& a, Point const& dim){
+    bool isUpdated = false;
+    m_pos.x = a.x;
+    m_pos.y = a.y;
+    Point un = Point{m_pos.x, m_pos.y + STEP};
+    Point deux = Point{m_pos.x,  m_pos.y + STEP*2};
+    Point trois = Point{m_pos.x + STEP, m_pos.y + STEP*2};
+
+    if (lower(m_pos, dim) && lower(un, dim) && lower(deux, dim) && lower(trois, dim)) {
+        m_piece[0] = m_pos;
+        m_piece[1] = un;
+        m_piece[2] = deux;
+        m_piece[3] = trois;
+        isUpdated = true;
+    }
+    return isUpdated;
+}
+
+// Reverse L
+BlueRicky::BlueRicky(Point a){
+    bool valid = update(a, m_window);
+    while (!valid) {
+        int x = (std::rand() % 10) * STEP;
+        valid = update(Point{x, a.y}, m_window);
+    }
+}
+
+bool BlueRicky::update(Point const& a, Point const& dim){
+    bool isUpdated = false;
+    m_pos.x = a.x;
+    m_pos.y = a.y;
+    Point un = Point{m_pos.x, m_pos.y + STEP};
+    Point deux = Point{m_pos.x,  m_pos.y + STEP*2};
+    Point trois = Point{m_pos.x - STEP, m_pos.y + STEP*2};
+
+    if (lower(m_pos, dim) && lower(un, dim) && lower(deux, dim) && lower(trois, dim)) {
+        m_piece[0] = m_pos;
+        m_piece[1] = un;
+        m_piece[2] = deux;
+        m_piece[3] = trois;
+        isUpdated = true;
+    }
+    return isUpdated;
 }
