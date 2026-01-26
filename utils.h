@@ -18,7 +18,7 @@ public:
     Point m_window = Point{240, 480};
     Point m_pos = {0, 0};
     Tetrimino(Point a);
-    Point* getT();
+    Point* getShape();
     int height();
     int width();
     void moveDown(int increment);
@@ -28,8 +28,7 @@ public:
       bool canMoveRight(int bound);
       bool canMoveLeft(int bound);
       bool canMoveDown(int bound);
-    bool canMoveDown();
-       std::vector<std::vector<bool>> m_grid;
+    bool canMove(std::vector<std::vector<bool>> grid, char direction);
 
 
 private:
@@ -47,6 +46,9 @@ public:
     static constexpr int STEP = SIZE_BLOCK * FACTOR;
     std::vector<std::vector<bool>> m_grid;
     std::vector<Tetrimino> m_tetriminos;
+    void add(Tetrimino const& tetrimino);
+    Tetrimino& current();
+    void updateGrid();
 
 private:
     Point m_window = Point{240, 480};

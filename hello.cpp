@@ -15,21 +15,17 @@ SDL_Surface *surface = NULL;
 
 static int W_Y = 480;
 static int W_X = 240;
-
 static int SIZE_BLOCK = 8;
 static int FACTOR = 3;
 
-static Point pos = { 0, 0}; // block position
-Tetrimino tetrimino = Tetrimino(pos);
-
 static Point* shape = NULL; // array
-std::vector<Tetrimino> tetriminos;
+Tetris game = Tetris();
 
 // CALL FIRST
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 {   
     char *png_path = NULL;
-    tetriminos.push_back(tetrimino);
+    game.add(Tetrimino({0, 0}));
     
     /* Create the window */
     if (!SDL_CreateWindowAndRenderer("Hello World", W_X, W_Y, SDL_WINDOW_RESIZABLE, &window, &renderer)) {
@@ -61,32 +57,35 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 /* This function runs when a new event (mouse input, keypresses, etc) occurs. */
 SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
 {
-    size_t index = tetriminos.size() - 1;
     if ((event->type == SDL_EVENT_KEY_DOWN && event->key.key == SDLK_Q)||
         event->type == SDL_EVENT_QUIT) {
         return SDL_APP_SUCCESS;  /* end the program, reporting success to the OS. */
     }
 
     // MOVE LEFT
-    if (event->type == SDL_EVENT_KEY_DOWN 
-        && event->key.key == SDLK_LEFT && tetriminos[index].canMoveLeft(Tetrimino::STEP)){
-            tetriminos[index].m_pos.x -= Tetrimino::STEP;
-            tetriminos[index].update(tetriminos[index].m_pos, tetriminos[index].m_window);
+    if (event->type == SDL_EVENT_KEY_DOWN && event->key.key == SDLK_LEFT 
+        && game.current().canMoveLeft(Tetrimino::STEP)
+        && game.current().canMove(game.m_grid, 'l')){
+            game.current().m_pos.x -= Tetrimino::STEP;
+            game.current().update(game.current().m_pos, game.current().m_window);
     }
 
     // MOVE RIGHT
-    if (event->type == SDL_EVENT_KEY_DOWN && 
-        event->key.key == SDLK_RIGHT && tetriminos[index].canMoveRight(W_X - Tetrimino::STEP)) {
-        tetriminos[index].m_pos.x+= Tetrimino::STEP;
-        tetriminos[index].update(tetriminos[index].m_pos, tetriminos[index].m_window);
+    if (event->type == SDL_EVENT_KEY_DOWN && event->key.key == SDLK_RIGHT 
+        && game.current().canMoveRight(W_X - Tetrimino::STEP)
+        && game.current().canMove(game.m_grid, 'r')) {
+        game.current().m_pos.x+= Tetrimino::STEP;
+        game.current().update(game.current().m_pos, game.current().m_window);
     }
 
     // MOVE DOWN
-    if (event->type == SDL_EVENT_KEY_DOWN && 
-        event->key.key == SDLK_DOWN && tetriminos[index].canMoveDown(W_X - Tetrimino::STEP)) {
-        tetriminos[index].m_pos.y+= Tetrimino::STEP;
-        tetriminos[index].update(tetriminos[index].m_pos, tetriminos[index].m_window);
+    if (event->type == SDL_EVENT_KEY_DOWN && event->key.key == SDLK_DOWN 
+        && game.current().canMoveDown(W_Y - Tetrimino::STEP)
+        && game.current().canMove(game.m_grid, 'd')) {
+        game.current().m_pos.y+= Tetrimino::STEP;
+        game.current().update(game.current().m_pos, game.current().m_window); 
     }
+
     return SDL_APP_CONTINUE;
 }
 
@@ -94,8 +93,7 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
 SDL_AppResult SDL_AppIterate(void *appstate)
 {
     SDL_FRect dst;
-    size_t len = tetriminos.size();
-    shape = tetriminos[len-1].getT(); // array
+    shape = game.current().getShape();
     
     const char* message = "Hi!";
     int w = 0;
@@ -116,8 +114,8 @@ SDL_AppResult SDL_AppIterate(void *appstate)
     SDL_RenderDebugText(renderer, x, y, message);
 
     // tetriminos
-    for (Tetrimino t : tetriminos){
-        shape = t.getT();
+    for (Tetrimino t : game.m_tetriminos){
+        shape = t.getShape();
         for (int i = 0; i < 4; ++i) {
             dst.x = static_cast<float>(shape[i].x);
             dst.y = static_cast<float>(shape[i].y);
@@ -127,9 +125,6 @@ SDL_AppResult SDL_AppIterate(void *appstate)
         }
     }
      
-
-
-
     SDL_RenderPresent(renderer);
 
     // EVERY SECOND MOVE DOWN
@@ -138,27 +133,22 @@ SDL_AppResult SDL_AppIterate(void *appstate)
     if (time_now - last_time >= 1000){
         last_time = time_now;
 
-        if (tetriminos[len-1].canMoveDown(W_Y - Tetrimino::STEP) && (tetriminos[len-1].canMoveDown())){
-                tetriminos[len-1].m_pos.y+= Tetrimino::STEP;
-                tetriminos[len-1].update(tetriminos[len-1].m_pos, tetriminos[len-1].m_window);
-        } 
+        if (game.current().canMoveDown(W_Y - Tetrimino::STEP) && (game.current().canMove(game.m_grid, 'd'))){
+                game.current().m_pos.y+= Tetrimino::STEP;
+                game.current().update(game.current().m_pos, game.current().m_window);
+        } else {
+            game.updateGrid();
+            SDL_Log("update every second ?");
+            game.add(Tetrimino(Point{0, 0}));
+        }
     }
-
-    if (!tetriminos[len-1].canMoveDown()){
-        // TODO
-        // update m_grid
-        // m_grid attribute => another class => Tetris
-        tetriminos.push_back(Tetrimino(Point{0, 0}));
-       
-    }
-   
+ 
     return SDL_APP_CONTINUE;
 }
 
 /* This function runs once at shutdown. */
 void SDL_AppQuit(void *appstate, SDL_AppResult result)
 {
-    SDL_Log("%s\n rand: %f\n x: %d, y: %d", "bye bye!", SDL_randf(), tetriminos[tetriminos.size()-1].m_pos.x, tetriminos[tetriminos.size()-1].m_pos.y);
+    SDL_Log("%s\n rand: %f\n x: %d, y: %d", "bye bye!", SDL_randf(), game.current().m_pos.x, game.current().m_pos.y);
     SDL_Log("x=%d, y=%d", shape[3].x, shape[3].y);
-
 }

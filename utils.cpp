@@ -1,4 +1,5 @@
 #include "utils.h"
+#include <iostream>
 
 int min(int a, int b){
     if (a < b)
@@ -17,6 +18,13 @@ Tetris::Tetris(){
     buildGrid();
 }
 
+void Tetris::add(Tetrimino const& tetrimino){
+    m_tetriminos.push_back(tetrimino);
+}
+
+Tetrimino& Tetris::current() {
+    return m_tetriminos[m_tetriminos.size()-1];
+}
 void Tetris::buildGrid() {
     for (int x = 0; x < m_window.x / STEP; ++x) {
         m_grid.push_back(std::vector<bool>{});
@@ -26,12 +34,19 @@ void Tetris::buildGrid() {
     }
 }
 
+void Tetris::updateGrid(){
+    Point* shape = current().getShape();
+    for (size_t i = 0; i < 4; ++i) {
+        int x = shape[i].x / STEP;
+        int y = shape[i].y / STEP;
+        m_grid[x][y] = false;
+    }
+}
+
 
 // class Tetrimino
 Tetrimino::Tetrimino(Point a) {
-    // T 
     update(a, m_window);
-    buildGrid();
 }
 
 bool Tetrimino::update(Point& a, Point& dim){
@@ -63,10 +78,25 @@ bool Tetrimino::canMoveDown(int bound){
     }
     return move;
 }
-bool Tetrimino::canMoveDown(){
+bool Tetrimino::canMove(std::vector<std::vector<bool>> grid, char direction){
     bool move = true;
+    int a = 0;
+    int b = 0;
+    switch (direction){
+        case 'l':
+            a = - STEP;
+            b = 0;
+            break;
+        case 'r':
+            a = STEP;
+            b = 0;
+            break;
+        default: // down
+            a = 0;
+            b = STEP;
+    }
     for (int i = 0; i < 4; ++i){
-        if (!m_grid[m_piece[i].x / STEP][ (m_piece[i].y + STEP) / STEP]){
+        if (!grid[(m_piece[i].x + a) / STEP ][(m_piece[i].y + b) / STEP]){
             move = false;
             break;
         }
@@ -104,7 +134,7 @@ bool Tetrimino::lower(Point& a, Point& b) {
     return islower;
 }
 
-Point* Tetrimino::getT()
+Point* Tetrimino::getShape()
 {
     return m_piece;
 }
@@ -132,13 +162,4 @@ int Tetrimino::height() {
         maximum = max(maximum,m_piece[i].y);
     }
     return 0;
-}
-
-void Tetrimino::buildGrid() {
-    for (int x = 0; x < m_window.x / STEP; ++x) {
-        m_grid.push_back(std::vector<bool>{});
-        for (int y = 0; y < m_window.y / STEP; ++y){
-            m_grid[x].push_back(true);
-        }
-    }
 }
