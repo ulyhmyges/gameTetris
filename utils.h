@@ -34,11 +34,13 @@ public:
 
     std::vector<Point> getShape();
  
-    void moveDown(int increment);
-    void moveLeft(int increment);
-    void moveRight(int increment);
-    virtual bool update(Point const& a, Point const& window) = 0;
-    //virtual bool rotate() = 0;
+    void moveDown(std::vector<std::vector<bool>>& grid);
+    void moveLeft(std::vector<std::vector<bool>>& grid);
+    void moveRight(std::vector<std::vector<bool>>& grid);
+    virtual bool create(Point const& a, Point const& window) = 0;
+    virtual bool rotateRight(std::vector<std::vector<bool>>& grid) = 0;
+    virtual bool rotateLeft(std::vector<std::vector<bool>>& grid) = 0;
+
 
     bool canMoveRight(int bound);
     bool canMoveLeft(int bound);
@@ -56,8 +58,9 @@ public:
     Teewee(Point a);
     ~Teewee() = default;
     // virtual ~Teewee() is automatically generated
-    bool update(Point const& a, Point const& window) override;
-    //bool rotateRight(std::vector<std::vector<bool>> grid);
+    bool create(Point const& a, Point const& window) override;
+    bool rotateRight(std::vector<std::vector<bool>>& grid) override;
+    bool rotateLeft(std::vector<std::vector<bool>>& grid) override;
 
 };
 
@@ -65,23 +68,30 @@ class Smashboy : public Tetrimino {
 public:
     Smashboy(Point a);
     ~Smashboy() = default; // virtual ~Teewee() is automatically generated
-    bool update(Point const& a, Point const& window) override;
+    bool create(Point const& a, Point const& window) override;
+    bool rotateRight(std::vector<std::vector<bool>>& grid) override;
+    bool rotateLeft(std::vector<std::vector<bool>>& grid) override;
 
 };
 
+// I
 class Hero : public Tetrimino {
 public:
     Hero(Point a);
     ~Hero() = default;
-    bool update(Point const& a, Point const& window) override;
-
+    bool create(Point const& a, Point const& window) override;
+    bool rotateRight(std::vector<std::vector<bool>>& grid) override;
+    bool rotateLeft(std::vector<std::vector<bool>>& grid) override;
 };
 
+// S
 class RhodeIsland : public Tetrimino {
 public:
     RhodeIsland(Point a);
     ~RhodeIsland() = default;
-    bool update(Point const& a, Point const& window) override;
+    bool create(Point const& a, Point const& window) override;
+    bool rotateRight(std::vector<std::vector<bool>>& grid) override;
+    bool rotateLeft(std::vector<std::vector<bool>>& grid) override;
 };
 
 // Z
@@ -89,7 +99,9 @@ class Cleveland : public Tetrimino {
 public:
     Cleveland(Point a);
     ~Cleveland() = default;
-    bool update(Point const& a, Point const& window) override;
+    bool create(Point const& a, Point const& window) override;
+    bool rotateRight(std::vector<std::vector<bool>>& grid) override;
+    bool rotateLeft(std::vector<std::vector<bool>>& grid) override;
 };
 
 // L
@@ -97,7 +109,9 @@ class OrangeRicky : public Tetrimino {
 public:
     OrangeRicky(Point a);
     ~OrangeRicky() = default;
-    bool update(Point const& a, Point const& window) override;
+    bool create(Point const& a, Point const& window) override;
+    bool rotateRight(std::vector<std::vector<bool>>& grid) override;
+    bool rotateLeft(std::vector<std::vector<bool>>& grid) override;
 };
 
 // J
@@ -105,8 +119,9 @@ class BlueRicky : public Tetrimino {
 public:
     BlueRicky(Point a);
     ~BlueRicky() = default;
-    bool update(Point const& a, Point const& window) override;
-    bool rotateRight(std::vector<std::vector<bool>>& grid);
+    bool create(Point const& a, Point const& window) override;
+    bool rotateRight(std::vector<std::vector<bool>>& grid) override;
+    bool rotateLeft(std::vector<std::vector<bool>>& grid) override;
 };
 
 class Tetris {

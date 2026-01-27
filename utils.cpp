@@ -50,8 +50,7 @@ std::unique_ptr<Tetrimino> Tetris::block() {
 
 
 std::unique_ptr<Tetrimino> Tetris::block(Type type) {
-    //int x = (std::rand() % 10) * STEP;
-       int x = 0;
+    int x = (std::rand() % 10) * STEP;
     switch (type){
         case T:
             return std::make_unique<Teewee>(Point{x, 0});
@@ -165,30 +164,35 @@ std::vector<Point> Tetrimino::getShape()
     return m_piece;
 }
 
-void Tetrimino::moveDown(int increment){
-    m_pos.y += increment;
-    update(m_pos, m_window);
+void Tetrimino::moveDown(std::vector<std::vector<bool>>& grid){
+    for (size_t i = 0; i < m_piece.size(); ++i){
+        m_piece[i].y += STEP;
+    }
+    
 }
 
-void Tetrimino::moveRight(int increment){
-    m_pos.x += increment;
-    update(m_pos, m_window);
-}
-
-void Tetrimino::moveLeft(int increment){
-    m_pos.x -= increment;
-    update(m_pos, m_window);
-}
-
-Teewee::Teewee(Point a){
-    bool valid = update(a, m_window);
-    while (!valid) {
-        int x = (std::rand() % 10) * STEP;
-        valid = update(Point{x, a.y}, m_window);
+void Tetrimino::moveRight(std::vector<std::vector<bool>>& grid){
+    for (size_t i = 0; i < m_piece.size(); ++i){
+        m_piece[i].x += STEP;
     }
 }
 
-bool Teewee::update(Point const& a, Point const& dim){
+void Tetrimino::moveLeft(std::vector<std::vector<bool>>& grid){
+    for (size_t i = 0; i < m_piece.size(); ++i){
+        m_piece[i].x -= STEP;
+    }
+    
+}
+
+Teewee::Teewee(Point a){
+    bool valid = create(a, m_window);
+    while (!valid) {
+        int x = (std::rand() % 10) * STEP;
+        valid = create(Point{x, a.y}, m_window);
+    }
+}
+
+bool Teewee::create(Point const& a, Point const& dim){
     bool isUpdated = false;
     m_pos.x = a.x;
     m_pos.y = a.y;
@@ -208,36 +212,59 @@ bool Teewee::update(Point const& a, Point const& dim){
     return isUpdated;
 }
 
-// bool Teewee::rotateRight(std::vector<std::vector<bool>> grid) {
-//     bool rotated = true;
-//     std::vector<Point> v ;
-//     v.push_back(Point{m_piece[0].x, m_piece[0].y - STEP});
-//     v.push_back({m_piece[1].x - STEP, m_piece[1].y});
-//     v.push_back(Point{m_piece[2].x, m_piece[2].y + STEP});
-//     v.push_back( Point{m_piece[3].x + STEP, m_piece[3].y - STEP*2});
-//     for (size_t i = 0; i < v.size(); ++i){
-//         if (!grid[v[i].x / STEP][v[i].y / STEP]) {
-//             rotated = false;
-//             break;
-//         }
-//     }
-//     if (rotated) {
-//         for (size_t i = 0; i < m_piece.size(); ++i){
-//             m_piece[i] = v[i];
-//         }
-//     }
-//     return rotated;
-// }
+bool Teewee::rotateRight(std::vector<std::vector<bool>>& grid) {
+    // TODO
+    bool rotated = true;
+    std::vector<Point> v ;
+    v.push_back(Point{m_piece[0].x, m_piece[0].y - STEP});
+    v.push_back({m_piece[1].x - STEP, m_piece[1].y});
+    v.push_back(Point{m_piece[2].x, m_piece[2].y + STEP});
+    v.push_back( Point{m_piece[3].x + STEP, m_piece[3].y - STEP*2});
+    for (size_t i = 0; i < v.size(); ++i){
+        if (!grid[v[i].x / STEP][v[i].y / STEP]) {
+            rotated = false;
+            break;
+        }
+    }
+    if (rotated) {
+        for (size_t i = 0; i < m_piece.size(); ++i){
+            m_piece[i] = v[i];
+        }
+    }
+    return rotated;
+}
+
+bool Teewee::rotateLeft(std::vector<std::vector<bool>>& grid) {
+    // TODO
+    bool rotated = true;
+    std::vector<Point> v ;
+    v.push_back(Point{m_piece[0].x - STEP*3, m_piece[0].y + STEP});
+    v.push_back({m_piece[1].x - STEP*2, m_piece[1].y});
+    v.push_back(Point{m_piece[2].x - STEP, m_piece[2].y - STEP});
+    v.push_back( Point{m_piece[3].x, m_piece[3].y});
+    for (size_t i = 0; i < v.size(); ++i){
+        if (!grid[v[i].x / STEP][v[i].y / STEP]) {
+            rotated = false;
+            break;
+        }
+    }
+    if (rotated) {
+        for (size_t i = 0; i < m_piece.size(); ++i){
+            m_piece[i] = v[i];
+        }
+    }
+    return rotated;
+}
 
 Smashboy::Smashboy(Point a){
-    bool valid = update(a, m_window);
+    bool valid = create(a, m_window);
     while (!valid) {
         int x = (std::rand() % 10) * STEP;
-        valid = update(Point{x, a.y}, m_window);
+        valid = create(Point{x, a.y}, m_window);
     }
 }
 
-bool Smashboy::update(Point const& a, Point const& dim){
+bool Smashboy::create(Point const& a, Point const& dim){
     bool isUpdated = false;
     m_pos.x = a.x;
     m_pos.y = a.y;
@@ -255,16 +282,60 @@ bool Smashboy::update(Point const& a, Point const& dim){
     return isUpdated;
 }
 
+bool Smashboy::rotateRight(std::vector<std::vector<bool>>& grid) {
+    // TODO
+    bool rotated = true;
+    std::vector<Point> v ;
+    v.push_back(Point{m_piece[0].x, m_piece[0].y - STEP});
+    v.push_back({m_piece[1].x - STEP, m_piece[1].y});
+    v.push_back(Point{m_piece[2].x, m_piece[2].y + STEP});
+    v.push_back( Point{m_piece[3].x + STEP, m_piece[3].y - STEP*2});
+    for (size_t i = 0; i < v.size(); ++i){
+        if (!grid[v[i].x / STEP][v[i].y / STEP]) {
+            rotated = false;
+            break;
+        }
+    }
+    if (rotated) {
+        for (size_t i = 0; i < m_piece.size(); ++i){
+            m_piece[i] = v[i];
+        }
+    }
+    return rotated;
+}
+
+bool Smashboy::rotateLeft(std::vector<std::vector<bool>>& grid) {
+    // TODO
+    bool rotated = true;
+    std::vector<Point> v ;
+    v.push_back(Point{m_piece[0].x - STEP*3, m_piece[0].y + STEP});
+    v.push_back({m_piece[1].x - STEP*2, m_piece[1].y});
+    v.push_back(Point{m_piece[2].x - STEP, m_piece[2].y - STEP});
+    v.push_back( Point{m_piece[3].x, m_piece[3].y});
+    for (size_t i = 0; i < v.size(); ++i){
+        if (!grid[v[i].x / STEP][v[i].y / STEP]) {
+            rotated = false;
+            break;
+        }
+    }
+    if (rotated) {
+        for (size_t i = 0; i < m_piece.size(); ++i){
+            m_piece[i] = v[i];
+        }
+    }
+    return rotated;
+}
+
 // I
 Hero::Hero(Point a){
-    bool valid = update(a, m_window);
+    bool valid = create(a, m_window);
     while (!valid) {
         int x = (std::rand() % 10) * STEP;
-        valid = update(Point{x, a.y}, m_window);
+        valid = create(Point{x, a.y}, m_window);
     }
 }
 
-bool Hero::update(Point const& a, Point const& dim){
+bool Hero::create(Point const& a, Point const& dim){
     bool isUpdated = false;
     m_pos.x = a.x;
     m_pos.y = a.y;
@@ -282,16 +353,60 @@ bool Hero::update(Point const& a, Point const& dim){
     return isUpdated;
 }
 
+bool Hero::rotateRight(std::vector<std::vector<bool>>& grid) {
+    // TODO
+    bool rotated = true;
+    std::vector<Point> v ;
+    v.push_back(Point{m_piece[0].x, m_piece[0].y - STEP});
+    v.push_back({m_piece[1].x - STEP, m_piece[1].y});
+    v.push_back(Point{m_piece[2].x, m_piece[2].y + STEP});
+    v.push_back( Point{m_piece[3].x + STEP, m_piece[3].y - STEP*2});
+    for (size_t i = 0; i < v.size(); ++i){
+        if (!grid[v[i].x / STEP][v[i].y / STEP]) {
+            rotated = false;
+            break;
+        }
+    }
+    if (rotated) {
+        for (size_t i = 0; i < m_piece.size(); ++i){
+            m_piece[i] = v[i];
+        }
+    }
+    return rotated;
+}
+
+bool Hero::rotateLeft(std::vector<std::vector<bool>>& grid) {
+    // TODO
+    bool rotated = true;
+    std::vector<Point> v ;
+    v.push_back(Point{m_piece[0].x - STEP*3, m_piece[0].y + STEP});
+    v.push_back({m_piece[1].x - STEP*2, m_piece[1].y});
+    v.push_back(Point{m_piece[2].x - STEP, m_piece[2].y - STEP});
+    v.push_back( Point{m_piece[3].x, m_piece[3].y});
+    for (size_t i = 0; i < v.size(); ++i){
+        if (!grid[v[i].x / STEP][v[i].y / STEP]) {
+            rotated = false;
+            break;
+        }
+    }
+    if (rotated) {
+        for (size_t i = 0; i < m_piece.size(); ++i){
+            m_piece[i] = v[i];
+        }
+    }
+    return rotated;
+}
+
 // S
 RhodeIsland::RhodeIsland(Point a){
-    bool valid = update(a, m_window);
+    bool valid = create(a, m_window);
     while (!valid) {
         int x = (std::rand() % 10) * STEP;
-        valid = update(Point{x, a.y}, m_window);
+        valid = create(Point{x, a.y}, m_window);
     }
 }
 
-bool RhodeIsland::update(Point const& a, Point const& dim){
+bool RhodeIsland::create(Point const& a, Point const& dim){
     bool isUpdated = false;
     m_pos.x = a.x;
     m_pos.y = a.y;
@@ -309,16 +424,60 @@ bool RhodeIsland::update(Point const& a, Point const& dim){
     return isUpdated;
 }
 
+bool RhodeIsland::rotateRight(std::vector<std::vector<bool>>& grid) {
+    // TODO
+    bool rotated = true;
+    std::vector<Point> v ;
+    v.push_back(Point{m_piece[0].x, m_piece[0].y - STEP});
+    v.push_back({m_piece[1].x - STEP, m_piece[1].y});
+    v.push_back(Point{m_piece[2].x, m_piece[2].y + STEP});
+    v.push_back( Point{m_piece[3].x + STEP, m_piece[3].y - STEP*2});
+    for (size_t i = 0; i < v.size(); ++i){
+        if (!grid[v[i].x / STEP][v[i].y / STEP]) {
+            rotated = false;
+            break;
+        }
+    }
+    if (rotated) {
+        for (size_t i = 0; i < m_piece.size(); ++i){
+            m_piece[i] = v[i];
+        }
+    }
+    return rotated;
+}
+
+bool RhodeIsland::rotateLeft(std::vector<std::vector<bool>>& grid) {
+    // TODO
+    bool rotated = true;
+    std::vector<Point> v ;
+    v.push_back(Point{m_piece[0].x - STEP*3, m_piece[0].y + STEP});
+    v.push_back({m_piece[1].x - STEP*2, m_piece[1].y});
+    v.push_back(Point{m_piece[2].x - STEP, m_piece[2].y - STEP});
+    v.push_back( Point{m_piece[3].x, m_piece[3].y});
+    for (size_t i = 0; i < v.size(); ++i){
+        if (!grid[v[i].x / STEP][v[i].y / STEP]) {
+            rotated = false;
+            break;
+        }
+    }
+    if (rotated) {
+        for (size_t i = 0; i < m_piece.size(); ++i){
+            m_piece[i] = v[i];
+        }
+    }
+    return rotated;
+}
+
 // Z
 Cleveland::Cleveland(Point a){
-    bool valid = update(a, m_window);
+    bool valid = create(a, m_window);
     while (!valid) {
         int x = (std::rand() % 10) * STEP;
-        valid = update(Point{x, a.y}, m_window);
+        valid = create(Point{x, a.y}, m_window);
     }
 }
 
-bool Cleveland::update(Point const& a, Point const& dim){
+bool Cleveland::create(Point const& a, Point const& dim){
     bool isUpdated = false;
     m_pos.x = a.x;
     m_pos.y = a.y;
@@ -336,16 +495,60 @@ bool Cleveland::update(Point const& a, Point const& dim){
     return isUpdated;
 }
 
+bool Cleveland::rotateRight(std::vector<std::vector<bool>>& grid) {
+    // TODO
+    bool rotated = true;
+    std::vector<Point> v ;
+    v.push_back(Point{m_piece[0].x, m_piece[0].y - STEP});
+    v.push_back({m_piece[1].x - STEP, m_piece[1].y});
+    v.push_back(Point{m_piece[2].x, m_piece[2].y + STEP});
+    v.push_back( Point{m_piece[3].x + STEP, m_piece[3].y - STEP*2});
+    for (size_t i = 0; i < v.size(); ++i){
+        if (!grid[v[i].x / STEP][v[i].y / STEP]) {
+            rotated = false;
+            break;
+        }
+    }
+    if (rotated) {
+        for (size_t i = 0; i < m_piece.size(); ++i){
+            m_piece[i] = v[i];
+        }
+    }
+    return rotated;
+}
+
+bool Cleveland::rotateLeft(std::vector<std::vector<bool>>& grid) {
+    // TODO
+    bool rotated = true;
+    std::vector<Point> v ;
+    v.push_back(Point{m_piece[0].x - STEP*3, m_piece[0].y + STEP});
+    v.push_back({m_piece[1].x - STEP*2, m_piece[1].y});
+    v.push_back(Point{m_piece[2].x - STEP, m_piece[2].y - STEP});
+    v.push_back( Point{m_piece[3].x, m_piece[3].y});
+    for (size_t i = 0; i < v.size(); ++i){
+        if (!grid[v[i].x / STEP][v[i].y / STEP]) {
+            rotated = false;
+            break;
+        }
+    }
+    if (rotated) {
+        for (size_t i = 0; i < m_piece.size(); ++i){
+            m_piece[i] = v[i];
+        }
+    }
+    return rotated;
+}
+
 // L
 OrangeRicky::OrangeRicky(Point a){
-    bool valid = update(a, m_window);
+    bool valid = create(a, m_window);
     while (!valid) {
         int x = (std::rand() % 10) * STEP;
-        valid = update(Point{x, a.y}, m_window);
+        valid = create(Point{x, a.y}, m_window);
     }
 }
 
-bool OrangeRicky::update(Point const& a, Point const& dim){
+bool OrangeRicky::create(Point const& a, Point const& dim){
     bool isUpdated = false;
     m_pos.x = a.x;
     m_pos.y = a.y;
@@ -363,30 +566,68 @@ bool OrangeRicky::update(Point const& a, Point const& dim){
     return isUpdated;
 }
 
+bool OrangeRicky::rotateRight(std::vector<std::vector<bool>>& grid) {
+    // TODO
+    bool rotated = true;
+    std::vector<Point> v ;
+    v.push_back(Point{m_piece[0].x, m_piece[0].y - STEP});
+    v.push_back({m_piece[1].x - STEP, m_piece[1].y});
+    v.push_back(Point{m_piece[2].x, m_piece[2].y + STEP});
+    v.push_back( Point{m_piece[3].x + STEP, m_piece[3].y - STEP*2});
+    for (size_t i = 0; i < v.size(); ++i){
+        if (!grid[v[i].x / STEP][v[i].y / STEP]) {
+            rotated = false;
+            break;
+        }
+    }
+    if (rotated) {
+        for (size_t i = 0; i < m_piece.size(); ++i){
+            m_piece[i] = v[i];
+        }
+    }
+    return rotated;
+}
+
+bool OrangeRicky::rotateLeft(std::vector<std::vector<bool>>& grid) {
+    // TODO
+    bool rotated = true;
+    std::vector<Point> v ;
+    v.push_back(Point{m_piece[0].x - STEP*3, m_piece[0].y + STEP});
+    v.push_back({m_piece[1].x - STEP*2, m_piece[1].y});
+    v.push_back(Point{m_piece[2].x - STEP, m_piece[2].y - STEP});
+    v.push_back( Point{m_piece[3].x, m_piece[3].y});
+    for (size_t i = 0; i < v.size(); ++i){
+        if (!grid[v[i].x / STEP][v[i].y / STEP]) {
+            rotated = false;
+            break;
+        }
+    }
+    if (rotated) {
+        for (size_t i = 0; i < m_piece.size(); ++i){
+            m_piece[i] = v[i];
+        }
+    }
+    return rotated;
+}
+
 // J
 BlueRicky::BlueRicky(Point a){
-    bool valid = update(a, m_window);
+    bool valid = create(a, m_window);
     while (!valid) {
-  
         int x = (std::rand() % 10) * STEP;
-        valid = update(Point{x, a.y}, m_window);
-        std::cout << "inside while, x=" << x << ", valid=" << valid << std::endl;
+        valid = create(Point{x, a.y}, m_window);
     }
 }
 
-bool BlueRicky::update(Point const& a, Point const& dim){
+bool BlueRicky::create(Point const& a, Point const& dim){
     bool isUpdated = false;
     m_pos.x = a.x;
     m_pos.y = a.y;
     Point un = Point{m_pos.x, m_pos.y + STEP};
     Point deux = Point{m_pos.x,  m_pos.y + STEP*2};
     Point trois = Point{m_pos.x - STEP, m_pos.y + STEP*2};
-    std::cout << "UPDATE\n";
 
     if (lower(m_pos, dim) && lower(un, dim) && lower(deux, dim) && lower(trois, dim)) {
-        std::cout << "inside IF ?\n";
-        std::cout << "lower 0=" << lower(m_pos, dim) << ", lower 1=" << lower(un, dim)
-         << ", lower 2=" << lower(deux, dim) << ", lower 3=" << lower(trois, dim) << std::endl;
         m_piece[0] = m_pos;
         m_piece[1] = un;
         m_piece[2] = deux;
@@ -399,10 +640,32 @@ bool BlueRicky::update(Point const& a, Point const& dim){
 bool BlueRicky::rotateRight(std::vector<std::vector<bool>>& grid) {
     bool rotated = true;
     std::vector<Point> v ;
-    v.push_back(Point{m_piece[0].x, m_piece[0].y - STEP});
-    v.push_back({m_piece[1].x - STEP, m_piece[1].y});
-    v.push_back(Point{m_piece[2].x, m_piece[2].y + STEP});
-    v.push_back( Point{m_piece[3].x + STEP, m_piece[3].y - STEP*2});
+    v.push_back(Point{m_piece[0].x + STEP*2, m_piece[0].y + STEP*2});
+    v.push_back({m_piece[1].x + STEP, m_piece[1].y + STEP});
+    v.push_back(Point{m_piece[2].x, m_piece[2].y});
+    v.push_back( Point{m_piece[3].x + STEP, m_piece[3].y - STEP});
+    for (size_t i = 0; i < v.size(); ++i){
+        if (!grid[v[i].x / STEP][v[i].y / STEP]) {
+            rotated = false;
+            break;
+        }
+    }
+    if (rotated) {
+        for (size_t i = 0; i < m_piece.size(); ++i){
+            m_piece[i] = v[i];
+        }
+    }
+    return rotated;
+}
+
+
+bool BlueRicky::rotateLeft(std::vector<std::vector<bool>>& grid) {
+    bool rotated = true;
+    std::vector<Point> v ;
+    v.push_back(Point{m_piece[0].x - STEP*3, m_piece[0].y + STEP});
+    v.push_back({m_piece[1].x - STEP*2, m_piece[1].y});
+    v.push_back(Point{m_piece[2].x - STEP, m_piece[2].y - STEP});
+    v.push_back( Point{m_piece[3].x, m_piece[3].y});
     for (size_t i = 0; i < v.size(); ++i){
         if (!grid[v[i].x / STEP][v[i].y / STEP]) {
             rotated = false;
