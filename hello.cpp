@@ -25,10 +25,8 @@ Tetris game = Tetris();
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 {   
     char *png_path = NULL;
-    game.add(game.block(Type::J));
-    bool boolean = game.current().rotateLeft(game.m_grid);
-    SDL_Log("rotate?=%d", boolean );
-    
+    game.add(game.block());
+
     /* Create the window */
     if (!SDL_CreateWindowAndRenderer("Hello World", W_X, W_Y, SDL_WINDOW_RESIZABLE, &window, &renderer)) {
         SDL_Log("Couldn't create window and renderer: %s", SDL_GetError());

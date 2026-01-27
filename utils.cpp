@@ -50,13 +50,15 @@ std::unique_ptr<Tetrimino> Tetris::block() {
 
 
 std::unique_ptr<Tetrimino> Tetris::block(Type type) {
-    int x = (std::rand() % 10) * STEP;
+    //int x = (std::rand() % 10) * STEP;
+    int x = 7 * STEP;
     switch (type){
         case T:
             return std::make_unique<Teewee>(Point{x, 0});
         case O:
             return std::make_unique<Smashboy>(Point{x, 0});
         case L:
+            std::cout << "Instance OrangeRicky\n";
             return std::make_unique<OrangeRicky>(Point{x, 0});
         case J:
             return std::make_unique<BlueRicky>(Point{x, 0});
@@ -213,47 +215,53 @@ bool Teewee::create(Point const& a, Point const& dim){
 }
 
 bool Teewee::rotateRight(std::vector<std::vector<bool>>& grid) {
-    // TODO
-    bool rotated = true;
     std::vector<Point> v ;
-    v.push_back(Point{m_piece[0].x, m_piece[0].y - STEP});
-    v.push_back({m_piece[1].x - STEP, m_piece[1].y});
-    v.push_back(Point{m_piece[2].x, m_piece[2].y + STEP});
-    v.push_back( Point{m_piece[3].x + STEP, m_piece[3].y - STEP*2});
-    for (size_t i = 0; i < v.size(); ++i){
-        if (!grid[v[i].x / STEP][v[i].y / STEP]) {
-            rotated = false;
-            break;
+    v.push_back(Point{m_piece[0].x + STEP, m_piece[0].y + STEP});
+    v.push_back(Point{m_piece[1].x, m_piece[1].y});
+    v.push_back(Point{m_piece[2].x - STEP, m_piece[2].y - STEP});
+    v.push_back(Point{m_piece[3].x - STEP, m_piece[3].y + STEP});
+    if (lower(v[0], m_window) && lower(v[1], m_window) && lower(v[2], m_window) && lower(v[3], m_window)){
+        bool rotated = true;
+        for (size_t i = 0; i < v.size(); ++i){
+            if (!grid[v[i].x / STEP][v[i].y / STEP]) {
+                rotated = false;
+                break;
+            }
+        }
+        if (rotated) {
+            for (size_t i = 0; i < m_piece.size(); ++i){
+                m_piece[i] = v[i];
+            }
+            return true;
         }
     }
-    if (rotated) {
-        for (size_t i = 0; i < m_piece.size(); ++i){
-            m_piece[i] = v[i];
-        }
-    }
-    return rotated;
+    
+    return false;
 }
 
 bool Teewee::rotateLeft(std::vector<std::vector<bool>>& grid) {
-    // TODO
-    bool rotated = true;
     std::vector<Point> v ;
-    v.push_back(Point{m_piece[0].x - STEP*3, m_piece[0].y + STEP});
-    v.push_back({m_piece[1].x - STEP*2, m_piece[1].y});
-    v.push_back(Point{m_piece[2].x - STEP, m_piece[2].y - STEP});
-    v.push_back( Point{m_piece[3].x, m_piece[3].y});
-    for (size_t i = 0; i < v.size(); ++i){
-        if (!grid[v[i].x / STEP][v[i].y / STEP]) {
-            rotated = false;
-            break;
+    v.push_back(Point{m_piece[0].x - STEP, m_piece[0].y + STEP});
+    v.push_back(Point{m_piece[1].x, m_piece[1].y});
+    v.push_back(Point{m_piece[2].x + STEP, m_piece[2].y - STEP});
+    v.push_back( Point{m_piece[3].x - STEP, m_piece[3].y - STEP});
+    if (lower(v[0], m_window) && lower(v[1], m_window) && lower(v[2], m_window) && lower(v[3], m_window)){
+        bool rotated = true;
+        for (size_t i = 0; i < v.size(); ++i){
+            if (!grid[v[i].x / STEP][v[i].y / STEP]) {
+                rotated = false;
+                break;
+            }
+        }
+        if (rotated) {
+            for (size_t i = 0; i < m_piece.size(); ++i){
+                m_piece[i] = v[i];
+            }
+            return true;
         }
     }
-    if (rotated) {
-        for (size_t i = 0; i < m_piece.size(); ++i){
-            m_piece[i] = v[i];
-        }
-    }
-    return rotated;
+    
+    return false;
 }
 
 Smashboy::Smashboy(Point a){
@@ -283,47 +291,11 @@ bool Smashboy::create(Point const& a, Point const& dim){
 }
 
 bool Smashboy::rotateRight(std::vector<std::vector<bool>>& grid) {
-    // TODO
-    bool rotated = true;
-    std::vector<Point> v ;
-    v.push_back(Point{m_piece[0].x, m_piece[0].y - STEP});
-    v.push_back({m_piece[1].x - STEP, m_piece[1].y});
-    v.push_back(Point{m_piece[2].x, m_piece[2].y + STEP});
-    v.push_back( Point{m_piece[3].x + STEP, m_piece[3].y - STEP*2});
-    for (size_t i = 0; i < v.size(); ++i){
-        if (!grid[v[i].x / STEP][v[i].y / STEP]) {
-            rotated = false;
-            break;
-        }
-    }
-    if (rotated) {
-        for (size_t i = 0; i < m_piece.size(); ++i){
-            m_piece[i] = v[i];
-        }
-    }
-    return rotated;
+    return true;
 }
 
 bool Smashboy::rotateLeft(std::vector<std::vector<bool>>& grid) {
-    // TODO
-    bool rotated = true;
-    std::vector<Point> v ;
-    v.push_back(Point{m_piece[0].x - STEP*3, m_piece[0].y + STEP});
-    v.push_back({m_piece[1].x - STEP*2, m_piece[1].y});
-    v.push_back(Point{m_piece[2].x - STEP, m_piece[2].y - STEP});
-    v.push_back( Point{m_piece[3].x, m_piece[3].y});
-    for (size_t i = 0; i < v.size(); ++i){
-        if (!grid[v[i].x / STEP][v[i].y / STEP]) {
-            rotated = false;
-            break;
-        }
-    }
-    if (rotated) {
-        for (size_t i = 0; i < m_piece.size(); ++i){
-            m_piece[i] = v[i];
-        }
-    }
-    return rotated;
+    return true;
 }
 
 // I
@@ -354,47 +326,53 @@ bool Hero::create(Point const& a, Point const& dim){
 }
 
 bool Hero::rotateRight(std::vector<std::vector<bool>>& grid) {
-    // TODO
-    bool rotated = true;
     std::vector<Point> v ;
-    v.push_back(Point{m_piece[0].x, m_piece[0].y - STEP});
-    v.push_back({m_piece[1].x - STEP, m_piece[1].y});
-    v.push_back(Point{m_piece[2].x, m_piece[2].y + STEP});
-    v.push_back( Point{m_piece[3].x + STEP, m_piece[3].y - STEP*2});
-    for (size_t i = 0; i < v.size(); ++i){
-        if (!grid[v[i].x / STEP][v[i].y / STEP]) {
-            rotated = false;
-            break;
+    v.push_back(Point{m_piece[0].x + STEP*2, m_piece[0].y + STEP});
+    v.push_back(Point{m_piece[1].x + STEP, m_piece[1].y});
+    v.push_back(Point{m_piece[2].x, m_piece[2].y - STEP});
+    v.push_back( Point{m_piece[3].x - STEP, m_piece[3].y - STEP*2});
+    if (lower(v[0], m_window) && lower(v[1], m_window) && lower(v[2], m_window) && lower(v[3], m_window)){
+        bool rotated = true;
+        for (size_t i = 0; i < v.size(); ++i){
+            if (!grid[v[i].x / STEP][v[i].y / STEP]) {
+                rotated = false;
+                break;
+            }
+        }
+        if (rotated) {
+            for (size_t i = 0; i < m_piece.size(); ++i){
+                m_piece[i] = v[i];
+            }
+            return true;
         }
     }
-    if (rotated) {
-        for (size_t i = 0; i < m_piece.size(); ++i){
-            m_piece[i] = v[i];
-        }
-    }
-    return rotated;
+   
+    return false;
 }
 
 bool Hero::rotateLeft(std::vector<std::vector<bool>>& grid) {
-    // TODO
-    bool rotated = true;
     std::vector<Point> v ;
-    v.push_back(Point{m_piece[0].x - STEP*3, m_piece[0].y + STEP});
-    v.push_back({m_piece[1].x - STEP*2, m_piece[1].y});
-    v.push_back(Point{m_piece[2].x - STEP, m_piece[2].y - STEP});
-    v.push_back( Point{m_piece[3].x, m_piece[3].y});
-    for (size_t i = 0; i < v.size(); ++i){
-        if (!grid[v[i].x / STEP][v[i].y / STEP]) {
-            rotated = false;
-            break;
+    v.push_back(Point{m_piece[0].x - STEP, m_piece[0].y + STEP});
+    v.push_back(Point{m_piece[1].x, m_piece[1].y});
+    v.push_back(Point{m_piece[2].x + STEP, m_piece[2].y - STEP});
+    v.push_back( Point{m_piece[3].x +STEP*2, m_piece[3].y - STEP*2});
+    if (lower(v[0], m_window) && lower(v[1], m_window) && lower(v[2], m_window) && lower(v[3], m_window)){
+        bool rotated = true;
+        for (size_t i = 0; i < v.size(); ++i){
+            if (!grid[v[i].x / STEP][v[i].y / STEP]) {
+                rotated = false;
+                break;
+            }
+        }
+        if (rotated) {
+            for (size_t i = 0; i < m_piece.size(); ++i){
+                m_piece[i] = v[i];
+            }
+            return true;
         }
     }
-    if (rotated) {
-        for (size_t i = 0; i < m_piece.size(); ++i){
-            m_piece[i] = v[i];
-        }
-    }
-    return rotated;
+  
+    return false;
 }
 
 // S
@@ -425,47 +403,53 @@ bool RhodeIsland::create(Point const& a, Point const& dim){
 }
 
 bool RhodeIsland::rotateRight(std::vector<std::vector<bool>>& grid) {
-    // TODO
-    bool rotated = true;
     std::vector<Point> v ;
-    v.push_back(Point{m_piece[0].x, m_piece[0].y - STEP});
-    v.push_back({m_piece[1].x - STEP, m_piece[1].y});
-    v.push_back(Point{m_piece[2].x, m_piece[2].y + STEP});
-    v.push_back( Point{m_piece[3].x + STEP, m_piece[3].y - STEP*2});
-    for (size_t i = 0; i < v.size(); ++i){
-        if (!grid[v[i].x / STEP][v[i].y / STEP]) {
-            rotated = false;
-            break;
+    v.push_back(Point{m_piece[0].x - STEP, m_piece[0].y + STEP*2});
+    v.push_back({m_piece[1].x, m_piece[1].y + STEP});
+    v.push_back(Point{m_piece[2].x - STEP, m_piece[2].y});
+    v.push_back( Point{m_piece[3].x, m_piece[3].y - STEP});
+    if (lower(v[0], m_window) && lower(v[1], m_window) && lower(v[2], m_window) && lower(v[3], m_window)){
+        bool rotated = true;
+        for (size_t i = 0; i < v.size(); ++i){
+            if (!grid[v[i].x / STEP][v[i].y / STEP]) {
+                rotated = false;
+                break;
+            }
+        }
+        if (rotated) {
+            for (size_t i = 0; i < m_piece.size(); ++i){
+                m_piece[i] = v[i];
+            }
+            return true;
         }
     }
-    if (rotated) {
-        for (size_t i = 0; i < m_piece.size(); ++i){
-            m_piece[i] = v[i];
-        }
-    }
-    return rotated;
+
+    return false;
 }
 
 bool RhodeIsland::rotateLeft(std::vector<std::vector<bool>>& grid) {
-    // TODO
-    bool rotated = true;
     std::vector<Point> v ;
-    v.push_back(Point{m_piece[0].x - STEP*3, m_piece[0].y + STEP});
-    v.push_back({m_piece[1].x - STEP*2, m_piece[1].y});
-    v.push_back(Point{m_piece[2].x - STEP, m_piece[2].y - STEP});
-    v.push_back( Point{m_piece[3].x, m_piece[3].y});
-    for (size_t i = 0; i < v.size(); ++i){
-        if (!grid[v[i].x / STEP][v[i].y / STEP]) {
-            rotated = false;
-            break;
+    v.push_back(Point{m_piece[0].x - STEP*2, m_piece[0].y});
+    v.push_back({m_piece[1].x - STEP, m_piece[1].y + STEP});
+    v.push_back(Point{m_piece[2].x, m_piece[2].y});
+    v.push_back( Point{m_piece[3].x + STEP, m_piece[3].y + STEP});
+    if (lower(v[0], m_window) && lower(v[1], m_window) && lower(v[2], m_window) && lower(v[3], m_window)){
+        bool rotated = true;
+        for (size_t i = 0; i < v.size(); ++i){
+            if (!grid[v[i].x / STEP][v[i].y / STEP]) {
+                rotated = false;
+                break;
+            }
+        }
+        if (rotated) {
+            for (size_t i = 0; i < m_piece.size(); ++i){
+                m_piece[i] = v[i];
+            }
+            return true;
         }
     }
-    if (rotated) {
-        for (size_t i = 0; i < m_piece.size(); ++i){
-            m_piece[i] = v[i];
-        }
-    }
-    return rotated;
+    
+    return false;
 }
 
 // Z
@@ -496,47 +480,52 @@ bool Cleveland::create(Point const& a, Point const& dim){
 }
 
 bool Cleveland::rotateRight(std::vector<std::vector<bool>>& grid) {
-    // TODO
-    bool rotated = true;
     std::vector<Point> v ;
-    v.push_back(Point{m_piece[0].x, m_piece[0].y - STEP});
-    v.push_back({m_piece[1].x - STEP, m_piece[1].y});
-    v.push_back(Point{m_piece[2].x, m_piece[2].y + STEP});
-    v.push_back( Point{m_piece[3].x + STEP, m_piece[3].y - STEP*2});
-    for (size_t i = 0; i < v.size(); ++i){
-        if (!grid[v[i].x / STEP][v[i].y / STEP]) {
-            rotated = false;
-            break;
+    v.push_back(Point{m_piece[0].x + STEP, m_piece[0].y});
+    v.push_back(Point{m_piece[1].x, m_piece[1].y + STEP});
+    v.push_back(Point{m_piece[2].x - STEP, m_piece[2].y});
+    v.push_back( Point{m_piece[3].x - STEP*2, m_piece[3].y + STEP});
+    if (lower(v[0], m_window) && lower(v[1], m_window) && lower(v[2], m_window) && lower(v[3], m_window)){
+        bool rotated = true;
+        for (size_t i = 0; i < v.size(); ++i){
+            if (!grid[v[i].x / STEP][v[i].y / STEP]) {
+                rotated = false;
+                break;
+            }
+        }
+        if (rotated) {
+            for (size_t i = 0; i < m_piece.size(); ++i){
+                m_piece[i] = v[i];
+            }
+            return true;
         }
     }
-    if (rotated) {
-        for (size_t i = 0; i < m_piece.size(); ++i){
-            m_piece[i] = v[i];
-        }
-    }
-    return rotated;
+
+    return false;
 }
 
 bool Cleveland::rotateLeft(std::vector<std::vector<bool>>& grid) {
-    // TODO
-    bool rotated = true;
     std::vector<Point> v ;
-    v.push_back(Point{m_piece[0].x - STEP*3, m_piece[0].y + STEP});
-    v.push_back({m_piece[1].x - STEP*2, m_piece[1].y});
-    v.push_back(Point{m_piece[2].x - STEP, m_piece[2].y - STEP});
-    v.push_back( Point{m_piece[3].x, m_piece[3].y});
-    for (size_t i = 0; i < v.size(); ++i){
-        if (!grid[v[i].x / STEP][v[i].y / STEP]) {
-            rotated = false;
-            break;
+    v.push_back(Point{m_piece[0].x, m_piece[0].y + STEP*2});
+    v.push_back({m_piece[1].x - STEP, m_piece[1].y + STEP});
+    v.push_back(Point{m_piece[2].x, m_piece[2].y});
+    v.push_back( Point{m_piece[3].x - STEP, m_piece[3].y - STEP});
+    if (lower(v[0], m_window) && lower(v[1], m_window) && lower(v[2], m_window) && lower(v[3], m_window)){
+        bool rotated = true;
+        for (size_t i = 0; i < v.size(); ++i){
+            if (!grid[v[i].x / STEP][v[i].y / STEP]) {
+                rotated = false;
+                break;
+            }
+        }
+        if (rotated) {
+            for (size_t i = 0; i < m_piece.size(); ++i){
+                m_piece[i] = v[i];
+            }
+            return true;
         }
     }
-    if (rotated) {
-        for (size_t i = 0; i < m_piece.size(); ++i){
-            m_piece[i] = v[i];
-        }
-    }
-    return rotated;
+    return false;
 }
 
 // L
@@ -566,48 +555,54 @@ bool OrangeRicky::create(Point const& a, Point const& dim){
     return isUpdated;
 }
 
-bool OrangeRicky::rotateRight(std::vector<std::vector<bool>>& grid) {
-    // TODO
-    bool rotated = true;
+bool OrangeRicky::rotateLeft(std::vector<std::vector<bool>>& grid) {
     std::vector<Point> v ;
-    v.push_back(Point{m_piece[0].x, m_piece[0].y - STEP});
-    v.push_back({m_piece[1].x - STEP, m_piece[1].y});
-    v.push_back(Point{m_piece[2].x, m_piece[2].y + STEP});
-    v.push_back( Point{m_piece[3].x + STEP, m_piece[3].y - STEP*2});
-    for (size_t i = 0; i < v.size(); ++i){
-        if (!grid[v[i].x / STEP][v[i].y / STEP]) {
-            rotated = false;
-            break;
+    v.push_back(Point{m_piece[0].x - STEP, m_piece[0].y + STEP*2});
+    v.push_back({m_piece[1].x, m_piece[1].y + STEP});
+    v.push_back(Point{m_piece[2].x + STEP, m_piece[2].y});
+    v.push_back( Point{m_piece[3].x, m_piece[3].y - STEP});
+    if (lower(v[0], m_window) && lower(v[1], m_window) && lower(v[2], m_window) && lower(v[3], m_window)){
+        bool rotated = true;
+        for (size_t i = 0; i < v.size(); ++i){
+            if (!grid[v[i].x / STEP][v[i].y / STEP]) {
+                rotated = false;
+                break;
+            }
+        }
+        if (rotated) {
+            for (size_t i = 0; i < m_piece.size(); ++i){
+                m_piece[i] = v[i];
+            }
+            return true;
         }
     }
-    if (rotated) {
-        for (size_t i = 0; i < m_piece.size(); ++i){
-            m_piece[i] = v[i];
-        }
-    }
-    return rotated;
+   
+    return false;
 }
 
-bool OrangeRicky::rotateLeft(std::vector<std::vector<bool>>& grid) {
-    // TODO
-    bool rotated = true;
+bool OrangeRicky::rotateRight(std::vector<std::vector<bool>>& grid) {
     std::vector<Point> v ;
-    v.push_back(Point{m_piece[0].x - STEP*3, m_piece[0].y + STEP});
-    v.push_back({m_piece[1].x - STEP*2, m_piece[1].y});
-    v.push_back(Point{m_piece[2].x - STEP, m_piece[2].y - STEP});
-    v.push_back( Point{m_piece[3].x, m_piece[3].y});
-    for (size_t i = 0; i < v.size(); ++i){
-        if (!grid[v[i].x / STEP][v[i].y / STEP]) {
-            rotated = false;
-            break;
+    v.push_back(Point{m_piece[0].x + STEP*2, m_piece[0].y + STEP});
+    v.push_back(Point{m_piece[1].x + STEP, m_piece[1].y});
+    v.push_back(Point{m_piece[2].x, m_piece[2].y - STEP});
+    v.push_back(Point{m_piece[3].x - STEP, m_piece[3].y});
+    if (lower(v[0], m_window) && lower(v[1], m_window) && lower(v[2], m_window) && lower(v[3], m_window)){
+        bool rotated = true;
+        for (size_t i = 0; i < v.size(); ++i){
+            if (!grid[v[i].x / STEP][v[i].y / STEP]) {
+                rotated = false;
+                break;
+            }
+        }
+        if (rotated) {
+            for (size_t i = 0; i < m_piece.size(); ++i){
+                m_piece[i] = v[i];
+            }
+            return true;
         }
     }
-    if (rotated) {
-        for (size_t i = 0; i < m_piece.size(); ++i){
-            m_piece[i] = v[i];
-        }
-    }
-    return rotated;
+  
+    return false;
 }
 
 // J
@@ -638,38 +633,44 @@ bool BlueRicky::create(Point const& a, Point const& dim){
 }
 
 bool BlueRicky::rotateRight(std::vector<std::vector<bool>>& grid) {
-    bool rotated = true;
     std::vector<Point> v ;
-    v.push_back(Point{m_piece[0].x + STEP*2, m_piece[0].y + STEP*2});
-    v.push_back({m_piece[1].x + STEP, m_piece[1].y + STEP});
-    v.push_back(Point{m_piece[2].x, m_piece[2].y});
-    v.push_back( Point{m_piece[3].x + STEP, m_piece[3].y - STEP});
-    for (size_t i = 0; i < v.size(); ++i){
-        if (!grid[v[i].x / STEP][v[i].y / STEP]) {
-            rotated = false;
-            break;
+    v.push_back(Point{m_piece[0].x + STEP, m_piece[0].y + STEP*2});
+    v.push_back(Point{m_piece[1].x, m_piece[1].y + STEP});
+    v.push_back(Point{m_piece[2].x - STEP, m_piece[2].y});
+    v.push_back( Point{m_piece[3].x, m_piece[3].y - STEP});
+    if (lower(v[0], m_window) && lower(v[1], m_window) && lower(v[2], m_window) && lower(v[3], m_window)){
+        bool rotated = true;
+        for (size_t i = 0; i < v.size(); ++i){
+            if (!grid[v[i].x / STEP][v[i].y / STEP]) {
+                rotated = false;
+                break;
+            }
+        }
+        if (rotated) {
+            for (size_t i = 0; i < m_piece.size(); ++i){
+                m_piece[i] = v[i];
+            }
+            return true;
         }
     }
-    if (rotated) {
-        for (size_t i = 0; i < m_piece.size(); ++i){
-            m_piece[i] = v[i];
-        }
-    }
-    return rotated;
+  
+    return false;
 }
 
 
 bool BlueRicky::rotateLeft(std::vector<std::vector<bool>>& grid) {
     bool rotated = true;
     std::vector<Point> v ;
-    v.push_back(Point{m_piece[0].x - STEP*3, m_piece[0].y + STEP});
-    v.push_back({m_piece[1].x - STEP*2, m_piece[1].y});
-    v.push_back(Point{m_piece[2].x - STEP, m_piece[2].y - STEP});
-    v.push_back( Point{m_piece[3].x, m_piece[3].y});
-    for (size_t i = 0; i < v.size(); ++i){
-        if (!grid[v[i].x / STEP][v[i].y / STEP]) {
-            rotated = false;
-            break;
+    v.push_back(Point{m_piece[0].x - STEP*2, m_piece[0].y + STEP});
+    v.push_back(Point{m_piece[1].x - STEP, m_piece[1].y});
+    v.push_back(Point{m_piece[2].x, m_piece[2].y - STEP});
+    v.push_back( Point{m_piece[3].x + STEP, m_piece[3].y});
+    if (lower(v[0], m_window) && lower(v[1], m_window) && lower(v[2], m_window) && lower(v[3], m_window)){
+        for (size_t i = 0; i < v.size(); ++i){
+            if (!grid[v[i].x / STEP][v[i].y / STEP]) {
+                rotated = false;
+                break;
+            }
         }
     }
     if (rotated) {
