@@ -18,14 +18,14 @@ static int W_X = 240;
 static int SIZE_BLOCK = 8;
 static int FACTOR = 3;
 
-static Point* shape = NULL; // array
+static std::vector<Point> shape; // array
 Tetris game = Tetris();
 
 // CALL FIRST
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 {   
     char *png_path = NULL;
-    game.add(game.block());
+    game.add(game.block(Type::J));
     
     /* Create the window */
     if (!SDL_CreateWindowAndRenderer("Hello World", W_X, W_Y, SDL_WINDOW_RESIZABLE, &window, &renderer)) {
@@ -114,7 +114,9 @@ SDL_AppResult SDL_AppIterate(void *appstate)
     SDL_RenderDebugText(renderer, x, y, message);
 
     // tetriminos
-    for (std::unique_ptr<Tetrimino>& t : game.m_tetriminos){
+    for (std::unique_ptr<Tetrimino> const& t : game.m_tetriminos){
+        // TODO change shape into Vector
+        // loop with vector.size()
         shape = t->getShape();
         for (int i = 0; i < 4; ++i) {
             dst.x = static_cast<float>(shape[i].x);
@@ -138,7 +140,7 @@ SDL_AppResult SDL_AppIterate(void *appstate)
                 game.current().update(game.current().m_pos, game.current().m_window);
         } else {
             game.updateGrid();
-            game.add(game.block());
+            game.add(game.block(Type::J));
         }
     }
  

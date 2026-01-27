@@ -12,9 +12,9 @@ int max(int a, int b);
 
 enum Type {
     T,
-    Block,
+    O,
     L,
-    ReverseL,
+    J,
     Z,
     S,
     I
@@ -32,12 +32,13 @@ public:
    //Tetrimino(Point a);
     virtual ~Tetrimino() = default;
 
-    Point* getShape();
+    std::vector<Point> getShape();
  
     void moveDown(int increment);
     void moveLeft(int increment);
     void moveRight(int increment);
     virtual bool update(Point const& a, Point const& window) = 0;
+    //virtual bool rotate() = 0;
 
     bool canMoveRight(int bound);
     bool canMoveLeft(int bound);
@@ -46,10 +47,8 @@ public:
 
 
 protected:
-    Point m_piece[4] = {};
+    std::vector<Point> m_piece = {Point{0,0}, Point{0,0}, Point{0,0}, Point{0,0}};
     bool lower(Point const& a, Point const& b);
-    void buildGrid();
-    
 };
 
 class Teewee : public Tetrimino {
@@ -58,6 +57,7 @@ public:
     ~Teewee() = default;
     // virtual ~Teewee() is automatically generated
     bool update(Point const& a, Point const& window) override;
+    //bool rotateRight(std::vector<std::vector<bool>> grid);
 
 };
 
@@ -100,12 +100,13 @@ public:
     bool update(Point const& a, Point const& window) override;
 };
 
-// Reverse L
+// J
 class BlueRicky : public Tetrimino {
 public:
     BlueRicky(Point a);
     ~BlueRicky() = default;
     bool update(Point const& a, Point const& window) override;
+    bool rotateRight(std::vector<std::vector<bool>>& grid);
 };
 
 class Tetris {

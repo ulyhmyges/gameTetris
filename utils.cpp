@@ -35,7 +35,7 @@ void Tetris::buildGrid() {
 }
 
 void Tetris::updateGrid(){
-    Point* shape = current().getShape();
+    std::vector<Point> shape = current().getShape();
     for (size_t i = 0; i < 4; ++i) {
         int x = shape[i].x / STEP;
         int y = shape[i].y / STEP;
@@ -50,15 +50,16 @@ std::unique_ptr<Tetrimino> Tetris::block() {
 
 
 std::unique_ptr<Tetrimino> Tetris::block(Type type) {
-    int x = (std::rand() % 10) * STEP;
+    //int x = (std::rand() % 10) * STEP;
+       int x = 0;
     switch (type){
         case T:
             return std::make_unique<Teewee>(Point{x, 0});
-        case Block:
+        case O:
             return std::make_unique<Smashboy>(Point{x, 0});
         case L:
             return std::make_unique<OrangeRicky>(Point{x, 0});
-        case ReverseL:
+        case J:
             return std::make_unique<BlueRicky>(Point{x, 0});
         case Z:
             return std::make_unique<Cleveland>(Point{x, 0});
@@ -153,13 +154,13 @@ bool Tetrimino::canMoveRight(int bound){
 
 bool Tetrimino::lower(Point const& a, Point const& b) {
     bool islower = false;
-    if (a.x < b.x && a.y < b.y){
+    if (a.x < b.x && a.y < b.y && a.x >= 0 && a.y >= 0){
         islower = true;
     }
     return islower;
 }
 
-Point* Tetrimino::getShape()
+std::vector<Point> Tetrimino::getShape()
 {
     return m_piece;
 }
@@ -206,6 +207,27 @@ bool Teewee::update(Point const& a, Point const& dim){
   
     return isUpdated;
 }
+
+// bool Teewee::rotateRight(std::vector<std::vector<bool>> grid) {
+//     bool rotated = true;
+//     std::vector<Point> v ;
+//     v.push_back(Point{m_piece[0].x, m_piece[0].y - STEP});
+//     v.push_back({m_piece[1].x - STEP, m_piece[1].y});
+//     v.push_back(Point{m_piece[2].x, m_piece[2].y + STEP});
+//     v.push_back( Point{m_piece[3].x + STEP, m_piece[3].y - STEP*2});
+//     for (size_t i = 0; i < v.size(); ++i){
+//         if (!grid[v[i].x / STEP][v[i].y / STEP]) {
+//             rotated = false;
+//             break;
+//         }
+//     }
+//     if (rotated) {
+//         for (size_t i = 0; i < m_piece.size(); ++i){
+//             m_piece[i] = v[i];
+//         }
+//     }
+//     return rotated;
+// }
 
 Smashboy::Smashboy(Point a){
     bool valid = update(a, m_window);
@@ -341,12 +363,14 @@ bool OrangeRicky::update(Point const& a, Point const& dim){
     return isUpdated;
 }
 
-// Reverse L
+// J
 BlueRicky::BlueRicky(Point a){
     bool valid = update(a, m_window);
     while (!valid) {
+  
         int x = (std::rand() % 10) * STEP;
         valid = update(Point{x, a.y}, m_window);
+        std::cout << "inside while, x=" << x << ", valid=" << valid << std::endl;
     }
 }
 
@@ -357,8 +381,12 @@ bool BlueRicky::update(Point const& a, Point const& dim){
     Point un = Point{m_pos.x, m_pos.y + STEP};
     Point deux = Point{m_pos.x,  m_pos.y + STEP*2};
     Point trois = Point{m_pos.x - STEP, m_pos.y + STEP*2};
+    std::cout << "UPDATE\n";
 
     if (lower(m_pos, dim) && lower(un, dim) && lower(deux, dim) && lower(trois, dim)) {
+        std::cout << "inside IF ?\n";
+        std::cout << "lower 0=" << lower(m_pos, dim) << ", lower 1=" << lower(un, dim)
+         << ", lower 2=" << lower(deux, dim) << ", lower 3=" << lower(trois, dim) << std::endl;
         m_piece[0] = m_pos;
         m_piece[1] = un;
         m_piece[2] = deux;
@@ -366,4 +394,25 @@ bool BlueRicky::update(Point const& a, Point const& dim){
         isUpdated = true;
     }
     return isUpdated;
+}
+
+bool BlueRicky::rotateRight(std::vector<std::vector<bool>>& grid) {
+    bool rotated = true;
+    std::vector<Point> v ;
+    v.push_back(Point{m_piece[0].x, m_piece[0].y - STEP});
+    v.push_back({m_piece[1].x - STEP, m_piece[1].y});
+    v.push_back(Point{m_piece[2].x, m_piece[2].y + STEP});
+    v.push_back( Point{m_piece[3].x + STEP, m_piece[3].y - STEP*2});
+    for (size_t i = 0; i < v.size(); ++i){
+        if (!grid[v[i].x / STEP][v[i].y / STEP]) {
+            rotated = false;
+            break;
+        }
+    }
+    if (rotated) {
+        for (size_t i = 0; i < m_piece.size(); ++i){
+            m_piece[i] = v[i];
+        }
+    }
+    return rotated;
 }
