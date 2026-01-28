@@ -25,7 +25,7 @@ Tetris game = Tetris();
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 {   
     char *png_path = NULL;
-    game.add(game.block(Type::T));
+    game.add(game.block(Type::I));
   
     /* Create the window */
     if (!SDL_CreateWindowAndRenderer("Hello World", W_X, W_Y, SDL_WINDOW_RESIZABLE, &window, &renderer)) {
