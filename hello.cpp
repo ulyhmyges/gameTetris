@@ -25,8 +25,8 @@ Tetris game = Tetris();
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 {   
     char *png_path = NULL;
-    game.add(game.block());
-
+    game.add(game.block(Type::T));
+  
     /* Create the window */
     if (!SDL_CreateWindowAndRenderer("Hello World", W_X, W_Y, SDL_WINDOW_RESIZABLE, &window, &renderer)) {
         SDL_Log("Couldn't create window and renderer: %s", SDL_GetError());
@@ -57,37 +57,49 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 /* This function runs when a new event (mouse input, keypresses, etc) occurs. */
 SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
 {
-    if ((event->type == SDL_EVENT_KEY_DOWN && event->key.key == SDLK_Q)||
-        event->type == SDL_EVENT_QUIT) {
-        return SDL_APP_SUCCESS;  /* end the program, reporting success to the OS. */
-    }
+    if ((event->key.key == SDLK_Q)||
+                event->type == SDL_EVENT_QUIT) {
+                return SDL_APP_SUCCESS;  /* end the program, reporting success to the OS. */
+            }
+    if (event->type == SDL_EVENT_KEY_DOWN) {
+        // MOVE LEFT
+        if (event->key.key == SDLK_LEFT 
+            && game.current().canMoveLeft(Tetrimino::STEP)
+            && game.current().canMove(game.m_grid, 'l')){
+                game.current().moveLeft(game.m_grid);
+                // game.current().m_pos.x -= Tetrimino::STEP;
+                // game.current().update(game.current().m_pos, game.current().m_window);
+        }
 
-    // MOVE LEFT
-    if (event->type == SDL_EVENT_KEY_DOWN && event->key.key == SDLK_LEFT 
-        && game.current().canMoveLeft(Tetrimino::STEP)
-        && game.current().canMove(game.m_grid, 'l')){
-            game.current().moveLeft(game.m_grid);
-            // game.current().m_pos.x -= Tetrimino::STEP;
+        // MOVE RIGHT
+        if (event->key.key == SDLK_RIGHT 
+            && game.current().canMoveRight(W_X - Tetrimino::STEP)
+            && game.current().canMove(game.m_grid, 'r')) {
+                game.current().moveRight(game.m_grid);
+            // game.current().m_pos.x+= Tetrimino::STEP;
             // game.current().update(game.current().m_pos, game.current().m_window);
-    }
+        }
 
-    // MOVE RIGHT
-    if (event->type == SDL_EVENT_KEY_DOWN && event->key.key == SDLK_RIGHT 
-        && game.current().canMoveRight(W_X - Tetrimino::STEP)
-        && game.current().canMove(game.m_grid, 'r')) {
-            game.current().moveRight(game.m_grid);
-        // game.current().m_pos.x+= Tetrimino::STEP;
-        // game.current().update(game.current().m_pos, game.current().m_window);
-    }
+        // MOVE DOWN
+        if (event->key.key == SDLK_DOWN 
+            && game.current().canMoveDown(W_Y - Tetrimino::STEP)
+            && game.current().canMove(game.m_grid, 'd')) {
+                game.current().moveDown(game.m_grid);
+            // game.current().m_pos.y+= Tetrimino::STEP;
+            // game.current().update(game.current().m_pos, game.current().m_window); 
+        }
 
-    // MOVE DOWN
-    if (event->type == SDL_EVENT_KEY_DOWN && event->key.key == SDLK_DOWN 
-        && game.current().canMoveDown(W_Y - Tetrimino::STEP)
-        && game.current().canMove(game.m_grid, 'd')) {
-            game.current().moveDown(game.m_grid);
-        // game.current().m_pos.y+= Tetrimino::STEP;
-        // game.current().update(game.current().m_pos, game.current().m_window); 
+        // rotation
+        // todo rotation 180
+        if (event->key.key == SDLK_M){
+            game.current().rotateRight(game.m_grid);
+        }
+        // rotation
+        if (event->key.key == SDLK_K  ){
+            game.current().rotateLeft(game.m_grid);
+        }
     }
+    
 
     return SDL_APP_CONTINUE;
 }

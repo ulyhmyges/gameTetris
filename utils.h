@@ -49,6 +49,7 @@ public:
 
 
 protected:
+    int m_angle = 0;
     std::vector<Point> m_piece = {Point{0,0}, Point{0,0}, Point{0,0}, Point{0,0}};
     bool lower(Point const& a, Point const& b);
 };
@@ -57,6 +58,7 @@ class Teewee : public Tetrimino {
 public:
     Teewee(Point a);
     ~Teewee() = default;
+
     // virtual ~Teewee() is automatically generated
     bool create(Point const& a, Point const& window) override;
     bool rotateRight(std::vector<std::vector<bool>>& grid) override;

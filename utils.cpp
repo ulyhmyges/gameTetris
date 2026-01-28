@@ -71,30 +71,7 @@ std::unique_ptr<Tetrimino> Tetris::block(Type type) {
     }
 }
 
-// class Tetrimino
-// Tetrimino::Tetrimino(Point a) {
-//     update(a, m_window);
-// }
-
-// bool Tetrimino::update(Point& a, Point& dim){
-//     bool isUpdated = false;
-//     m_pos.x = a.x;
-//     m_pos.y = a.y;
-  
-//     Point un = Point{m_pos.x, m_pos.y + STEP};
-//     Point deux = Point{m_pos.x,  m_pos.y + STEP * 2};
-//     Point trois = Point{m_pos.x + STEP, m_pos.y + STEP};
-
-//     if (lower(m_pos, dim) && lower(un, dim) && lower(deux, dim) && lower(trois, dim)) {
-//         m_piece[0] = m_pos;
-//         m_piece[1] = un;
-//         m_piece[2] = deux;
-//         m_piece[3] = trois;
-//         isUpdated = true;
-//     }
-  
-//     return isUpdated;
-// }
+// Tetrimino
 bool Tetrimino::canMoveDown(int bound){
     bool move = true;
     for (int i = 0; i < 4; ++i){
@@ -170,7 +147,6 @@ void Tetrimino::moveDown(std::vector<std::vector<bool>>& grid){
     for (size_t i = 0; i < m_piece.size(); ++i){
         m_piece[i].y += STEP;
     }
-    
 }
 
 void Tetrimino::moveRight(std::vector<std::vector<bool>>& grid){
@@ -193,7 +169,7 @@ Teewee::Teewee(Point a){
         valid = create(Point{x, a.y}, m_window);
     }
 }
-
+// T
 bool Teewee::create(Point const& a, Point const& dim){
     bool isUpdated = false;
     m_pos.x = a.x;
@@ -216,11 +192,42 @@ bool Teewee::create(Point const& a, Point const& dim){
 
 bool Teewee::rotateRight(std::vector<std::vector<bool>>& grid) {
     std::vector<Point> v ;
-    v.push_back(Point{m_piece[0].x + STEP, m_piece[0].y + STEP});
-    v.push_back(Point{m_piece[1].x, m_piece[1].y});
-    v.push_back(Point{m_piece[2].x - STEP, m_piece[2].y - STEP});
-    v.push_back(Point{m_piece[3].x - STEP, m_piece[3].y + STEP});
-    if (lower(v[0], m_window) && lower(v[1], m_window) && lower(v[2], m_window) && lower(v[3], m_window)){
+
+    switch (m_angle){
+    case 0:
+        //  angle => 90
+        v.push_back(Point{m_piece[0].x + STEP, m_piece[0].y + STEP});
+        v.push_back(Point{m_piece[1].x, m_piece[1].y});
+        v.push_back(Point{m_piece[2].x - STEP, m_piece[2].y - STEP});
+        v.push_back(Point{m_piece[3].x - STEP, m_piece[3].y + STEP});
+        break;
+    case 90:
+        // angle => 180
+        v.push_back(Point{m_piece[0].x - STEP, m_piece[0].y + STEP});
+        v.push_back(Point{m_piece[1].x, m_piece[1].y});
+        v.push_back(Point{m_piece[2].x + STEP, m_piece[2].y - STEP});
+        v.push_back(Point{m_piece[3].x - STEP, m_piece[3].y - STEP});
+        break;
+    case 180:
+        // angle => 270
+        v.push_back(Point{m_piece[0].x - STEP, m_piece[0].y - STEP});
+        v.push_back(Point{m_piece[1].x, m_piece[1].y});
+        v.push_back(Point{m_piece[2].x + STEP, m_piece[2].y + STEP});
+        v.push_back(Point{m_piece[3].x + STEP, m_piece[3].y - STEP});
+        break;
+    case 270:
+        // angle => 0
+        v.push_back(Point{m_piece[0].x + STEP, m_piece[0].y - STEP});
+        v.push_back(Point{m_piece[1].x, m_piece[1].y});
+        v.push_back(Point{m_piece[2].x - STEP, m_piece[2].y + STEP});
+        v.push_back(Point{m_piece[3].x + STEP, m_piece[3].y + STEP});
+        break;
+    default:
+        m_angle = 0;
+    }
+  
+  
+    if (v.size() == 4 && lower(v[0], m_window) && lower(v[1], m_window) && lower(v[2], m_window) && lower(v[3], m_window)){
         bool rotated = true;
         for (size_t i = 0; i < v.size(); ++i){
             if (!grid[v[i].x / STEP][v[i].y / STEP]) {
@@ -232,6 +239,7 @@ bool Teewee::rotateRight(std::vector<std::vector<bool>>& grid) {
             for (size_t i = 0; i < m_piece.size(); ++i){
                 m_piece[i] = v[i];
             }
+            m_angle = (m_angle + 90) % 360;
             return true;
         }
     }
@@ -241,11 +249,40 @@ bool Teewee::rotateRight(std::vector<std::vector<bool>>& grid) {
 
 bool Teewee::rotateLeft(std::vector<std::vector<bool>>& grid) {
     std::vector<Point> v ;
-    v.push_back(Point{m_piece[0].x - STEP, m_piece[0].y + STEP});
-    v.push_back(Point{m_piece[1].x, m_piece[1].y});
-    v.push_back(Point{m_piece[2].x + STEP, m_piece[2].y - STEP});
-    v.push_back( Point{m_piece[3].x - STEP, m_piece[3].y - STEP});
-    if (lower(v[0], m_window) && lower(v[1], m_window) && lower(v[2], m_window) && lower(v[3], m_window)){
+    
+    switch (m_angle){
+    case 0:
+        //  angle => 270
+        v.push_back(Point{m_piece[0].x - STEP, m_piece[0].y + STEP});
+        v.push_back(Point{m_piece[1].x, m_piece[1].y});
+        v.push_back(Point{m_piece[2].x + STEP, m_piece[2].y - STEP});
+        v.push_back( Point{m_piece[3].x - STEP, m_piece[3].y - STEP});
+        break;
+    case 270:
+        // angle => 180
+        v.push_back(Point{m_piece[0].x + STEP, m_piece[0].y + STEP});
+        v.push_back(Point{m_piece[1].x, m_piece[1].y});
+        v.push_back(Point{m_piece[2].x - STEP, m_piece[2].y - STEP});
+        v.push_back(Point{m_piece[3].x - STEP, m_piece[3].y + STEP});
+        break;
+    case 180:
+        // angle => 90
+        v.push_back(Point{m_piece[0].x + STEP, m_piece[0].y - STEP});
+        v.push_back(Point{m_piece[1].x, m_piece[1].y});
+        v.push_back(Point{m_piece[2].x - STEP, m_piece[2].y + STEP});
+        v.push_back(Point{m_piece[3].x + STEP, m_piece[3].y + STEP});
+        break;
+    case 90:
+        // angle => 0
+        v.push_back(Point{m_piece[0].x - STEP, m_piece[0].y - STEP});
+        v.push_back(Point{m_piece[1].x, m_piece[1].y});
+        v.push_back(Point{m_piece[2].x + STEP, m_piece[2].y + STEP});
+        v.push_back(Point{m_piece[3].x + STEP, m_piece[3].y - STEP});
+        break;
+    default:
+        m_angle = 0;
+    }
+    if (v.size() == 4 && lower(v[0], m_window) && lower(v[1], m_window) && lower(v[2], m_window) && lower(v[3], m_window)){
         bool rotated = true;
         for (size_t i = 0; i < v.size(); ++i){
             if (!grid[v[i].x / STEP][v[i].y / STEP]) {
@@ -257,6 +294,7 @@ bool Teewee::rotateLeft(std::vector<std::vector<bool>>& grid) {
             for (size_t i = 0; i < m_piece.size(); ++i){
                 m_piece[i] = v[i];
             }
+            m_angle = (m_angle + 270) % 360;
             return true;
         }
     }
