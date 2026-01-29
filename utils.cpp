@@ -407,7 +407,7 @@ bool Hero::rotateLeft(std::vector<std::vector<bool>>& grid) {
     return rotateRight(grid);
 }
 
-// S
+
 RhodeIsland::RhodeIsland(Point a){
     bool valid = create(a, m_window);
     while (!valid) {
@@ -415,7 +415,7 @@ RhodeIsland::RhodeIsland(Point a){
         valid = create(Point{x, a.y}, m_window);
     }
 }
-
+// S
 bool RhodeIsland::create(Point const& a, Point const& dim){
     bool isUpdated = false;
     m_pos.x = a.x;
@@ -436,11 +436,26 @@ bool RhodeIsland::create(Point const& a, Point const& dim){
 
 bool RhodeIsland::rotateRight(std::vector<std::vector<bool>>& grid) {
     std::vector<Point> v ;
-    v.push_back(Point{m_piece[0].x - STEP, m_piece[0].y + STEP*2});
-    v.push_back({m_piece[1].x, m_piece[1].y + STEP});
-    v.push_back(Point{m_piece[2].x - STEP, m_piece[2].y});
-    v.push_back( Point{m_piece[3].x, m_piece[3].y - STEP});
-    if (lower(v[0], m_window) && lower(v[1], m_window) && lower(v[2], m_window) && lower(v[3], m_window)){
+    switch (m_angle){
+    case 0:
+        //  angle => 90
+        v.push_back(Point{m_piece[0].x - STEP, m_piece[0].y + STEP*2});
+        v.push_back({m_piece[1].x, m_piece[1].y + STEP});
+        v.push_back(Point{m_piece[2].x - STEP, m_piece[2].y});
+        v.push_back( Point{m_piece[3].x, m_piece[3].y - STEP});
+        break;
+    case 90:
+        // angle => 0
+        // TODO
+        v.push_back(Point{m_piece[0].x + STEP, m_piece[0].y - STEP*2});
+        v.push_back(Point{m_piece[1].x, m_piece[1].y - STEP});
+        v.push_back(Point{m_piece[2].x + STEP, m_piece[2].y});
+        v.push_back(Point{m_piece[3].x, m_piece[3].y + STEP});
+        break;
+    default:
+        m_angle = 0;
+    }
+    if (v.size() && lower(v[0], m_window) && lower(v[1], m_window) && lower(v[2], m_window) && lower(v[3], m_window)){
         bool rotated = true;
         for (size_t i = 0; i < v.size(); ++i){
             if (!grid[v[i].x / STEP][v[i].y / STEP]) {
@@ -452,6 +467,7 @@ bool RhodeIsland::rotateRight(std::vector<std::vector<bool>>& grid) {
             for (size_t i = 0; i < m_piece.size(); ++i){
                 m_piece[i] = v[i];
             }
+            m_angle = (m_angle + 90) % 180;
             return true;
         }
     }
@@ -460,28 +476,7 @@ bool RhodeIsland::rotateRight(std::vector<std::vector<bool>>& grid) {
 }
 
 bool RhodeIsland::rotateLeft(std::vector<std::vector<bool>>& grid) {
-    std::vector<Point> v ;
-    v.push_back(Point{m_piece[0].x - STEP*2, m_piece[0].y});
-    v.push_back({m_piece[1].x - STEP, m_piece[1].y + STEP});
-    v.push_back(Point{m_piece[2].x, m_piece[2].y});
-    v.push_back( Point{m_piece[3].x + STEP, m_piece[3].y + STEP});
-    if (lower(v[0], m_window) && lower(v[1], m_window) && lower(v[2], m_window) && lower(v[3], m_window)){
-        bool rotated = true;
-        for (size_t i = 0; i < v.size(); ++i){
-            if (!grid[v[i].x / STEP][v[i].y / STEP]) {
-                rotated = false;
-                break;
-            }
-        }
-        if (rotated) {
-            for (size_t i = 0; i < m_piece.size(); ++i){
-                m_piece[i] = v[i];
-            }
-            return true;
-        }
-    }
-    
-    return false;
+    return rotateRight(grid);
 }
 
 // Z
